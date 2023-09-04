@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
-    <http:listener-config name="postman-x-api-httpListenerConfig">
-        <http:listener-connection host="0.0.0.0" port="8081" />
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+    <http:listener-config name="users-s-api-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8083" />
     </http:listener-config>
-    <apikit:config name="postman-x-api-config" api="resource::31db7303-83b4-4619-8da6-d7247976bed3:postman-x-api:1.0.1:raml:zip:postman-x-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
-    <http:request-config name="Accounts_P_API_HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="3413ac9e-1776-41dc-8ada-9afa38dad582">
-        <http:request-connection host="localhost" port="8082" />
-    </http:request-config>
-    <flow name="postman-x-api-main">
-        <http:listener config-ref="postman-x-api-httpListenerConfig" path="/api/*">
+    <apikit:config name="users-s-api-config" api="resource::31db7303-83b4-4619-8da6-d7247976bed3:users-s-api:1.0.0:raml:zip:users-s-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="users-s-api-main">
+        <http:listener config-ref="users-s-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:response>
@@ -17,7 +15,7 @@
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:error-response>
         </http:listener>
-        <apikit:router config-ref="postman-x-api-config" />
+        <apikit:router config-ref="users-s-api-config" />
         <error-handler>
             <on-error-propagate type="APIKIT:BAD_REQUEST">
                 <ee:transform doc:name="Transform Message">
@@ -99,8 +97,8 @@ output application/json
             </on-error-propagate>
         </error-handler>
     </flow>
-    <flow name="postman-x-api-console">
-        <http:listener config-ref="postman-x-api-httpListenerConfig" path="/console/*">
+    <flow name="users-s-api-console">
+        <http:listener config-ref="users-s-api-httpListenerConfig" path="/console/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:response>
@@ -109,7 +107,7 @@ output application/json
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:error-response>
         </http:listener>
-        <apikit:console config-ref="postman-x-api-config" />
+        <apikit:console config-ref="users-s-api-config" />
         <error-handler>
             <on-error-propagate type="APIKIT:NOT_FOUND">
                 <ee:transform doc:name="Transform Message">
@@ -126,33 +124,29 @@ output application/json
             </on-error-propagate>
         </error-handler>
     </flow>
-    <flow name="put:\users\(id):application\json:postman-x-api-config">
+    <flow name="put:\users\(id):application\json:users-s-api-config">
         <ee:transform doc:name="Transform Message">
             <ee:variables>
                 <ee:set-variable variableName="id">attributes.uriParams.'id'</ee:set-variable>
             </ee:variables>
         </ee:transform>
-        <logger level="INFO" message="put:\users\(id):application\json:postman-x-api-config" />
+        <logger level="INFO" message="put:\users\(id):application\json:users-s-api-config" />
     </flow>
-    <flow name="get:\users:postman-x-api-config">
-        <logger level="INFO" message="get:\users:postman-x-api-config" />
+    <flow name="get:\users:users-s-api-config">
+        <logger level="INFO" message="get:\users:users-s-api-config" />
     </flow>
-    <flow name="post:\users:application\json:postman-x-api-config">
-        <ee:transform doc:name="Hash password" doc:id="aa184358-5cd3-4c49-97c3-51f3d3b90dd7">
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-import dw::Crypto
-output application/java
----
-{
+    <flow name="post:\users:application\json:users-s-api-config">
+        <db:insert doc:name="Create new Account" doc:id="198a6507-bea9-4e00-879d-37bea800a20d" >
+			<db:sql ><![CDATA[INSERT INTO users (firstname, lastname, birth_date, email, password, favorite_driver)
+VALUES (:firstName, :lastName, :birthDate, :email, :password, :favoriteDriver); ]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
   "firstName": payload.firstName,
   "lastName": payload.lastName,
   "birthDate": payload.birthDate,
   "email": payload.email,
-  "password": Crypto::hashWith(payload.password as Binary, "SHA-512")
-}]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
-        <http:request method="POST" doc:name="POST /users" doc:id="2dacf1cd-8512-48ce-88ec-9fb0ee26925d" config-ref="Accounts_P_API_HTTP_Request_configuration" path="/users" />
+  "password": payload.password,
+  "favoriteDriver": payload.favoriteDriver
+}]]]></db:input-parameters>
+		</db:insert>
     </flow>
 </mule>
