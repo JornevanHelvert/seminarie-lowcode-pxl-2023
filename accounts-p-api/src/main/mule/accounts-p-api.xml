@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
-    <http:listener-config name="postman-x-api-httpListenerConfig">
-        <http:listener-connection host="0.0.0.0" port="8081" />
+    <http:listener-config name="accounts-p-api-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8082" />
     </http:listener-config>
-    <apikit:config name="postman-x-api-config" api="resource::31db7303-83b4-4619-8da6-d7247976bed3:postman-x-api:1.0.0:raml:zip:postman-x-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
-    <http:request-config name="Accounts_P_API_HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="3413ac9e-1776-41dc-8ada-9afa38dad582" >
-		<http:request-connection host="localhost" port="8082" />
+    <apikit:config name="accounts-p-api-config" api="resource::31db7303-83b4-4619-8da6-d7247976bed3:accounts-p-api:1.0.0:raml:zip:accounts-p-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <http:request-config name="Users_S_API_HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="8ab2c640-f39d-47f3-b136-ffac16389fd3">
+		<http:request-connection host="localhost" port="8083" />
 	</http:request-config>
-	<flow name="postman-x-api-main">
-        <http:listener config-ref="postman-x-api-httpListenerConfig" path="/api/*">
+	<flow name="accounts-p-api-main">
+        <http:listener config-ref="accounts-p-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:response>
@@ -17,7 +17,7 @@
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:error-response>
         </http:listener>
-        <apikit:router config-ref="postman-x-api-config" />
+        <apikit:router config-ref="accounts-p-api-config" />
         <error-handler>
             <on-error-propagate type="APIKIT:BAD_REQUEST">
                 <ee:transform doc:name="Transform Message">
@@ -99,8 +99,8 @@ output application/json
             </on-error-propagate>
         </error-handler>
     </flow>
-    <flow name="postman-x-api-console">
-        <http:listener config-ref="postman-x-api-httpListenerConfig" path="/console/*">
+    <flow name="accounts-p-api-console">
+        <http:listener config-ref="accounts-p-api-httpListenerConfig" path="/console/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:response>
@@ -109,7 +109,7 @@ output application/json
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:error-response>
         </http:listener>
-        <apikit:console config-ref="postman-x-api-config" />
+        <apikit:console config-ref="accounts-p-api-config" />
         <error-handler>
             <on-error-propagate type="APIKIT:NOT_FOUND">
                 <ee:transform doc:name="Transform Message">
@@ -126,33 +126,18 @@ output application/json
             </on-error-propagate>
         </error-handler>
     </flow>
-    <flow name="put:\users\(id):application\json:postman-x-api-config">
+    <flow name="put:\users\(id):application\json:accounts-p-api-config">
         <ee:transform doc:name="Transform Message">
             <ee:variables>
                 <ee:set-variable variableName="id">attributes.uriParams.'id'</ee:set-variable>
             </ee:variables>
         </ee:transform>
-        <logger level="INFO" message="put:\users\(id):application\json:postman-x-api-config" />
+        <logger level="INFO" message="put:\users\(id):application\json:accounts-p-api-config" />
     </flow>
-    <flow name="get:\users:postman-x-api-config">
-        <logger level="INFO" message="get:\users:postman-x-api-config" />
+    <flow name="get:\users:accounts-p-api-config">
+        <logger level="INFO" message="get:\users:accounts-p-api-config" />
     </flow>
-    <flow name="post:\users:application\json:postman-x-api-config">
-        <ee:transform doc:name="Hash password" doc:id="aa184358-5cd3-4c49-97c3-51f3d3b90dd7" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
-import dw::Crypto
-output application/java
----
-{
-  "firstName": payload.firstName,
-  "lastName": payload.lastName,
-  "birthDate": payload.birthDate,
-  "email": payload.email,
-  "password": Crypto::hashWith(payload.password as Binary, "SHA-512")
-}]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
-		<http:request method="POST" doc:name="POST /users" doc:id="2dacf1cd-8512-48ce-88ec-9fb0ee26925d" config-ref="Accounts_P_API_HTTP_Request_configuration" path="/users"/>
+    <flow name="post:\users:application\json:accounts-p-api-config">
+		<http:request method="POST" doc:name="POST /users" doc:id="ac12ff18-ad2b-4245-bb18-b4c8046ae2d2" config-ref="Users_S_API_HTTP_Request_configuration" path="/users"/>
     </flow>
 </mule>
