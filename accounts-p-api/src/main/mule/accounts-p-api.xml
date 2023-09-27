@@ -3,11 +3,11 @@
     <http:listener-config name="accounts-p-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8082" />
     </http:listener-config>
-    <apikit:config name="accounts-p-api-config" api="resource::31db7303-83b4-4619-8da6-d7247976bed3:accounts-p-api:1.0.0:raml:zip:accounts-p-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="accounts-p-api-config" api="resource::31db7303-83b4-4619-8da6-d7247976bed3:accounts-p-api:1.1.0:raml:zip:accounts-p-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <http:request-config name="Users_S_API_HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="8ab2c640-f39d-47f3-b136-ffac16389fd3">
-		<http:request-connection host="localhost" port="8083" />
-	</http:request-config>
-	<flow name="accounts-p-api-main">
+        <http:request-connection host="localhost" port="8083" />
+    </http:request-config>
+    <flow name="accounts-p-api-main">
         <http:listener config-ref="accounts-p-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
@@ -138,6 +138,14 @@ output application/json
         <logger level="INFO" message="get:\users:accounts-p-api-config" />
     </flow>
     <flow name="post:\users:application\json:accounts-p-api-config">
-		<http:request method="POST" doc:name="POST /users" doc:id="ac12ff18-ad2b-4245-bb18-b4c8046ae2d2" config-ref="Users_S_API_HTTP_Request_configuration" path="/users"/>
+        <http:request method="POST" doc:name="POST /users" doc:id="ac12ff18-ad2b-4245-bb18-b4c8046ae2d2" config-ref="Users_S_API_HTTP_Request_configuration" path="/users" />
+    </flow>
+    <flow name="get:\users\(id)\my-results:accounts-p-api-config">
+        <ee:transform doc:name="Transform Message">
+            <ee:variables>
+                <ee:set-variable variableName="id">attributes.uriParams.'id'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="get:\users\(id)\my-results:accounts-p-api-config" />
     </flow>
 </mule>

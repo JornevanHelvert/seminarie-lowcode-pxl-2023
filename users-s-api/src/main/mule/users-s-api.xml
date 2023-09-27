@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
-http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
     <http:listener-config name="users-s-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8083" />
     </http:listener-config>
-    <apikit:config name="users-s-api-config" api="resource::31db7303-83b4-4619-8da6-d7247976bed3:users-s-api:1.0.0:raml:zip:users-s-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="users-s-api-config" api="resource::31db7303-83b4-4619-8da6-d7247976bed3:users-s-api:1.1.0:raml:zip:users-s-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <flow name="users-s-api-main">
         <http:listener config-ref="users-s-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -136,10 +135,10 @@ output application/json
         <logger level="INFO" message="get:\users:users-s-api-config" />
     </flow>
     <flow name="post:\users:application\json:users-s-api-config">
-        <db:insert doc:name="Create new Account" doc:id="198a6507-bea9-4e00-879d-37bea800a20d" >
-			<db:sql ><![CDATA[INSERT INTO users (firstname, lastname, birth_date, email, password, favorite_driver)
-VALUES (:firstName, :lastName, :birthDate, :email, :password, :favoriteDriver); ]]></db:sql>
-			<db:input-parameters ><![CDATA[#[{
+        <db:insert doc:name="Create new Account" doc:id="198a6507-bea9-4e00-879d-37bea800a20d">
+            <db:sql><![CDATA[INSERT INTO users (firstname, lastname, birth_date, email, password, favorite_driver)
+VALUES (:firstName, :lastName, :birthDate, :email, :password, :favoriteDriver);]]></db:sql>
+            <db:input-parameters><![CDATA[#[{
   "firstName": payload.firstName,
   "lastName": payload.lastName,
   "birthDate": payload.birthDate,
@@ -147,6 +146,14 @@ VALUES (:firstName, :lastName, :birthDate, :email, :password, :favoriteDriver); 
   "password": payload.password,
   "favoriteDriver": payload.favoriteDriver
 }]]]></db:input-parameters>
-		</db:insert>
+        </db:insert>
+    </flow>
+    <flow name="get:\users\(id):application\json:users-s-api-config">
+        <ee:transform doc:name="Transform Message">
+            <ee:variables>
+                <ee:set-variable variableName="id">attributes.uriParams.'id'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="get:\users\(id):application\json:users-s-api-config" />
     </flow>
 </mule>

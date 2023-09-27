@@ -3,7 +3,7 @@
     <http:listener-config name="postman-x-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8081" />
     </http:listener-config>
-    <apikit:config name="postman-x-api-config" api="resource::31db7303-83b4-4619-8da6-d7247976bed3:postman-x-api:1.0.1:raml:zip:postman-x-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="postman-x-api-config" api="resource::31db7303-83b4-4619-8da6-d7247976bed3:postman-x-api:1.0.3:raml:zip:postman-x-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <http:request-config name="Accounts_P_API_HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="3413ac9e-1776-41dc-8ada-9afa38dad582">
         <http:request-connection host="localhost" port="8082" />
     </http:request-config>
@@ -154,5 +154,13 @@ output application/java
             </ee:message>
         </ee:transform>
         <http:request method="POST" doc:name="POST /users" doc:id="2dacf1cd-8512-48ce-88ec-9fb0ee26925d" config-ref="Accounts_P_API_HTTP_Request_configuration" path="/users" />
+    </flow>
+    <flow name="get:\users\(id)\my-results:postman-x-api-config">
+        <ee:transform doc:name="Transform Message">
+            <ee:variables>
+                <ee:set-variable variableName="id">attributes.uriParams.'id'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="get:\users\(id)\my-results:postman-x-api-config" />
     </flow>
 </mule>
