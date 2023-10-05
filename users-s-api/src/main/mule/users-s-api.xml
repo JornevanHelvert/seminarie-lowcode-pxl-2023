@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
-http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
     <http:listener-config name="users-s-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8083" />
     </http:listener-config>
-    <apikit:config name="users-s-api-config" api="resource::31db7303-83b4-4619-8da6-d7247976bed3:users-s-api:1.1.0:raml:zip:users-s-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
-    <db:config name="Database_Config" doc:name="Database Config" doc:id="1031b51c-9c33-45ab-b1dd-847136c70ffd" >
-		<db:generic-connection url="jdbc:postgresql://pxl-demo.postgres.database.azure.com:5432/postgres?sslmode=require" driverClassName="org.postgresql.Driver" user="postgresadmin@pxl-demo" password="${secure::database.password}"/>
-	</db:config>
-	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="0b237b09-1292-4d5e-9cc4-791db4ace653" file="secure.properties" key="${encryption_key}" />
-	<flow name="users-s-api-main">
+    <apikit:config name="users-s-api-config" api="resource::31db7303-83b4-4619-8da6-d7247976bed3:users-s-api:1.1.1:raml:zip:users-s-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <db:config name="Database_Config" doc:name="Database Config" doc:id="1031b51c-9c33-45ab-b1dd-847136c70ffd">
+        <db:generic-connection url="jdbc:postgresql://pxl-demo.postgres.database.azure.com:5432/postgres?sslmode=require" driverClassName="org.postgresql.Driver" user="postgresadmin@pxl-demo" password="${secure::database.password}" />
+    </db:config>
+    <secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="0b237b09-1292-4d5e-9cc4-791db4ace653" file="secure.properties" key="${encryption_key}" />
+    <flow name="users-s-api-main">
         <http:listener config-ref="users-s-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
@@ -19,8 +18,8 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:error-response>
         </http:listener>
-        <set-variable value="#[payload]" doc:name="incomingPayload" doc:id="62013b0a-4ee7-4df4-9b72-095fe87d08b1" variableName="incomingPayload"/>
-		<apikit:router config-ref="users-s-api-config" />
+        <set-variable value="#[payload]" doc:name="incomingPayload" doc:id="62013b0a-4ee7-4df4-9b72-095fe87d08b1" variableName="incomingPayload" />
+        <apikit:router config-ref="users-s-api-config" />
         <error-handler>
             <on-error-propagate type="APIKIT:BAD_REQUEST">
                 <ee:transform doc:name="Transform Message">
@@ -141,7 +140,7 @@ output application/json
         <logger level="INFO" message="get:\users:users-s-api-config" />
     </flow>
     <flow name="post:\users:application\json:users-s-api-config">
-		<db:insert doc:name="Create new Account" doc:id="198a6507-bea9-4e00-879d-37bea800a20d" config-ref="Database_Config">
+        <db:insert doc:name="Create new Account" doc:id="198a6507-bea9-4e00-879d-37bea800a20d" config-ref="Database_Config">
             <db:sql><![CDATA[INSERT INTO users (id, firstname, lastname, birth_date, email, password, favorite_driver)
 VALUES (:id, :firstName, :lastName, :birthDate, :email, :password, :favoriteDriver);]]></db:sql>
             <db:input-parameters><![CDATA[#[{
@@ -154,7 +153,7 @@ VALUES (:id, :firstName, :lastName, :birthDate, :email, :password, :favoriteDriv
   "favoriteDriver": vars.incomingPayload.favoriteDriver
 }]]]></db:input-parameters>
         </db:insert>
-		<set-payload value='#[output application/json&#10;---&#10;{&#10;  "firstName": vars.incomingPayload.firstName,&#10;  "lastName": vars.incomingPayload.lastName,&#10;  "birthDate": vars.incomingPayload.birthDate,&#10;  "email": vars.incomingPayload.email,&#10;  "id": correlationId&#10;}]' doc:name="Response body" doc:id="f6b5c04e-9237-488b-81b4-7ff495e12f2d" />
+        <set-payload value="#[output application/json&#xA;---&#xA;{&#xA;  &quot;firstName&quot;: vars.incomingPayload.firstName,&#xA;  &quot;lastName&quot;: vars.incomingPayload.lastName,&#xA;  &quot;birthDate&quot;: vars.incomingPayload.birthDate,&#xA;  &quot;email&quot;: vars.incomingPayload.email,&#xA;  &quot;id&quot;: correlationId&#xA;}]" doc:name="Response body" doc:id="f6b5c04e-9237-488b-81b4-7ff495e12f2d" />
     </flow>
     <flow name="get:\users\(id):application\json:users-s-api-config">
         <ee:transform doc:name="Transform Message">
@@ -163,5 +162,13 @@ VALUES (:id, :firstName, :lastName, :birthDate, :email, :password, :favoriteDriv
             </ee:variables>
         </ee:transform>
         <logger level="INFO" message="get:\users\(id):application\json:users-s-api-config" />
+    </flow>
+    <flow name="get:\users\(id):users-s-api-config">
+        <ee:transform doc:name="Transform Message">
+            <ee:variables>
+                <ee:set-variable variableName="id">attributes.uriParams.'id'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <logger level="INFO" message="get:\users\(id):users-s-api-config" />
     </flow>
 </mule>

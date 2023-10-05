@@ -3,7 +3,7 @@
     <http:listener-config name="f1-s-api-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8081" />
     </http:listener-config>
-    <apikit:config name="f1-s-api-config" api="resource::31db7303-83b4-4619-8da6-d7247976bed3:f1-s-api:1.0.0:raml:zip:f1-s-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="f1-s-api-config" api="resource::31db7303-83b4-4619-8da6-d7247976bed3:f1-s-api:1.0.1:raml:zip:f1-s-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <flow name="f1-s-api-main">
         <http:listener config-ref="f1-s-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -125,5 +125,8 @@ output application/json
     </flow>
     <flow name="get:\last-results:application\json:f1-s-api-config">
         <logger level="INFO" message="get:\last-results:application\json:f1-s-api-config" />
+    </flow>
+    <flow name="get:\last-results:f1-s-api-config">
+        <logger level="INFO" message="get:\last-results:f1-s-api-config" />
     </flow>
 </mule>
