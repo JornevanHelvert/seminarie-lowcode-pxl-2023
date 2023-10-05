@@ -142,7 +142,7 @@ output application/json
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
 import dw::Crypto
-output application/java
+output application/json
 ---
 {
   "firstName": payload.firstName,
